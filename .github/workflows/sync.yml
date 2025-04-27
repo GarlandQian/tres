@@ -1,0 +1,21 @@
+name: Sync Fork with Upstream
+on:
+  schedule:
+    - cron: '0 8 * * *'       # 每天 08:00 UTC 运行一次 :contentReference[oaicite:8]{index=8}
+  workflow_dispatch:         # 支持手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v3
+        with:
+          ref: main           # 你 Fork 的目标分支 :contentReference[oaicite:9]{index=9}
+
+      - name: Sync from upstream
+        uses: aormsby/Fork-Sync-With-Upstream-action@v1
+        with:
+          upstream_repository: Tresjs/tres
+          upstream_branch: main
+          target_branch: main  # 也可同步到其它分支 :contentReference[oaicite:10]{index=10}
