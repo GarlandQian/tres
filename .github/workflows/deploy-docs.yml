@@ -23,9 +23,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install            # 安装所有依赖 
 
-      - name: Build core library
-        run: pnpm run build          # 先打包 @tresjs/core，生成 dist/tres.js :contentReference[oaicite:9]{index=9}
-
       - name: Build docs
         run: pnpm run docs:build     # 构建文档，输出到 docs/.vitepress/dist :contentReference[oaicite:10]{index=10}
 
@@ -34,3 +31,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/.vitepress/dist  # 发布目录 :contentReference[oaicite:11]{index=11}
+          publish_branch: gh-pages
+          full_commit_message: ${{ github.event.head_commit.message }}
