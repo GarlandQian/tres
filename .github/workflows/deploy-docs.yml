@@ -1,22 +1,36 @@
 name: Deploy TresJS Docs
+
 on:
   push:
-    branches: [ main ]
+    branches: [ main ]        # 仅在推 main 时触发 :contentReference[oaicite:4]{index=4}
 
 permissions:
-  contents: read
-  pages: write
+  contents: read             # 读取仓库内容 :contentReference[oaicite:5]{index=5}
+  pages: write               # 写入 Pages 分支 :contentReference[oaicite:6]{index=6}
   id-token: write
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v4
-      - run: pnpm install
-      - run: pnpm run docs:build
-      - uses: peaceiris/actions-gh-pages@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3    # 克隆你的代码 :contentReference[oaicite:7]{index=7}
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4   # 安装 pnpm :contentReference[oaicite:8]{index=8}
+
+      - name: Install dependencies
+        run: pnpm install            # 安装所有依赖 
+
+      - name: Build core library
+        run: pnpm run build          # 先打包 @tresjs/core，生成 dist/tres.js :contentReference[oaicite:9]{index=9}
+
+      - name: Build docs
+        run: pnpm run docs:build     # 构建文档，输出到 docs/.vitepress/dist :contentReference[oaicite:10]{index=10}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/.vitepress/dist
+          publish_dir: ./docs/.vitepress/dist  # 发布目录 :contentReference[oaicite:11]{index=11}
