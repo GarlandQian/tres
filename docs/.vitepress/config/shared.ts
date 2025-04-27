@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 import { groupIconMdPlugin } from 'vitepress-plugin-group-icons'
 
 export const sharedConfig = defineConfig({
+  base: '/tres/',
   title: 'TresJS',
   description: 'Declarative ThreeJS using Vue Components',
   head: [
