@@ -1,41 +1,43 @@
-name: Deploy via Official Pages Actions
+name: 部署 TresJS 文档
 
 on:
   push:
-    branches: [ main ]            # 仅对 main 分支生效 :contentReference[oaicite:5]{index=5}
+    branches: [ main ]
 
 permissions:
-  contents: read                 # 仓库代码只读
-  pages: write                   # 发布到 Pages 写权限 :contentReference[oaicite:6]{index=6}
-  id-token: write                # 用于 OIDC 验证部署来源 :contentReference[oaicite:7]{index=7}
+  contents: read        # 只读源码
+  pages: write          # 写入 Pages
+  id-token: write       # OIDC 验证
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v3  # 获取源代码 :contentReference[oaicite:8]{index=8}
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5  
-        # 绑定 GitHub Pages 环境并生成必要的 metadata :contentReference[oaicite:9]{index=9}
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build library & docs
-        run: |
-          pnpm run build           # 打包 core 库
-          pnpm run docs:build      # 构建 VitePress 文档
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: 检出代码
+        uses: actions/checkout@v3                                     # 检出仓库 :contentReference[oaicite:8]{index=8}
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4                                    # 安装 pnpm :contentReference[oaicite:9]{index=9}
+      - name: 安装依赖
+        run: pnpm install                                             # 安装依赖
+      - name: 打包核心库
+        run: pnpm run build                                           # 生成 dist/tres.js
+      - name: 构建文档
+        run: pnpm run docs:build                                      # 输出至 docs/.vitepress/dist :contentReference[oaicite:10]{index=10}
+      - name: 上传 Pages Artifact
+        uses: actions/upload-pages-artifact@v3                        # 打包并上传部署用 artifact :contentReference[oaicite:11]{index=11}
         with:
-          path: docs/.vitepress/dist  # 指定静态文件目录 :contentReference[oaicite:10]{index=10}
+          path: docs/.vitepress/dist
 
-      - name: Deploy to Pages
-        uses: actions/deploy-pages@v4
-        environment:
-          name: github-pages        # 对应 Pages 环境名称 :contentReference[oaicite:11]{index=11}
-          url: ${{ steps.deployment.outputs.page_url }}
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write                                                # 允许部署 Pages :contentReference[oaicite:12]{index=12}
+      id-token: write                                             # 用于 OIDC
+    environment:
+      name: github-pages                                         # 指定 Pages 环境名 :contentReference[oaicite:13]{index=13}
+      # url 会自动填充部署后的网址
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4                             # 拉取 artifact 并发布 :contentReference[oaicite:14]{index=14}
